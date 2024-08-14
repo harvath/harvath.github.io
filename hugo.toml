@@ -1,0 +1,4 @@
+baseURL = 'https://harvath.github.io'
+languageCode = 'ja'
+title = 'harvath'
+theme = 'ananke'
