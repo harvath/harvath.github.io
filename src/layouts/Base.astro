@@ -1,0 +1,41 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const SITE_NAME = 'harvath';
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} - ${SITE_NAME}` : SITE_NAME;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE_NAME}
+      href="/rss.xml"
+    />
+  </head>
+  <body>
+    <header>
+      <a href="/">{SITE_NAME}</a>
+      <a href="/about/">about</a>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <a href="/rss.xml">RSS</a>
+      <a href="https://github.com/harvath" target="_blank" rel="noopener">
+        GitHub
+      </a>
+    </footer>
+  </body>
+</html>
