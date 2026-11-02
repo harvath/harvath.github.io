@@ -4,11 +4,12 @@ export type Post = CollectionEntry<'blog'> & { slug: string; url: string };
 
 const DATE_PREFIX = /^\d{4}-\d{2}-\d{2}-/;
 
-/** フォルダ名 `YYYY-MM-DD-slug` から先頭の日付を落として slug にする。 */
+/**
+ * entry.id はフォルダ名（glob loader が slug 化し `/index` を落としたもの）。
+ * 先頭の `YYYY-MM-DD-` だけを落として URL の slug にする。日付が無ければそのまま。
+ */
 export function toSlug(id: string): string {
-  // glob loader の id は `2026-11-02-sample/index` のような形になることがある
-  const folder = id.split('/')[0] ?? id;
-  return folder.replace(DATE_PREFIX, '');
+  return id.replace(DATE_PREFIX, '');
 }
 
 export function postUrl(slug: string): string {
@@ -29,17 +30,30 @@ export function yearOf(date: Date): string {
   return formatDate(date).slice(0, 4);
 }
 
-/** 公開記事を新しい順で返す。draft は本番 build では除外し、dev では含める。 */
+/** 公開記事を新しい順（同日は slug 順）で返す。draft は本番 build では除外し、dev では含める。 */
 export async function getPosts(): Promise<Post[]> {
   const entries = await getCollection('blog', ({ data }) =>
     import.meta.env.PROD ? !data.draft : true,
   );
-  return entries
-    .map((entry) => {
-      const slug = toSlug(entry.id);
-      return { ...entry, slug, url: postUrl(slug) };
-    })
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+  const seen = new Map<string, string>();
+  const posts = entries.map((entry) => {
+    const slug = toSlug(entry.id);
+    const other = seen.get(slug);
+    if (other !== undefined) {
+      throw new Error(
+        `slug "${slug}" が重複しています: src/content/blog/${other} と src/content/blog/${entry.id}`,
+      );
+    }
+    seen.set(slug, entry.id);
+    return { ...entry, slug, url: postUrl(slug) };
+  });
+
+  return posts.sort(
+    (a, b) =>
+      b.data.date.getTime() - a.data.date.getTime() ||
+      a.slug.localeCompare(b.slug),
+  );
 }
 
 /** 年ごとにまとめる（新しい年が先、年の中も新しい順）。 */
