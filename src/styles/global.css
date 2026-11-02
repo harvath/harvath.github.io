@@ -51,6 +51,7 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
 }
@@ -97,6 +98,7 @@ h1 {
   font-size: 1.55rem;
   line-height: 1.45;
   margin: 0 0 0.5rem;
+  text-wrap: balance;
 }
 
 .visually-hidden {
@@ -174,11 +176,12 @@ h1 {
   font-weight: 500;
   letter-spacing: 0.08em;
   color: var(--muted);
-  margin: 2.8rem 0 0.6rem;
+  margin: 0 0 0.6rem;
 }
 
-.year:first-of-type {
-  margin-top: 0;
+/* 年のグループ間だけ空ける（各 section に見出しは 1 つなので first-of-type は使えない） */
+.site-main > section + section .year {
+  margin-top: 2.8rem;
 }
 
 .posts {
@@ -366,10 +369,6 @@ h1 {
   }
 }
 
-.prose pre.astro-code {
-  background: var(--code-bg);
-}
-
 .prose hr {
   border: 0;
   width: 4rem;
@@ -436,17 +435,11 @@ h1 {
   padding-right: 0;
 }
 
-.prose strong {
-  font-weight: 600;
+/* html の overflow-wrap: anywhere でセル内のコードが途中で折れないようにする */
+.prose :is(td, th) code {
+  white-space: nowrap;
 }
 
-/* 動きは使っていないが、念のため */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
+.prose strong {
+  font-weight: 600;
 }

@@ -63,7 +63,7 @@ export const figure: HastPlugin = {
  * 相対リンクと `site` と同じホストへのリンクはそのまま。
  */
 export function externalLinks(site: string): HastPlugin {
-  const siteHost = new URL(site).host;
+  const siteHost = new URL(site).hostname;
   return {
     name: 'external-links',
     element: {
@@ -71,7 +71,7 @@ export function externalLinks(site: string): HastPlugin {
       visit(node, ctx) {
         const href = node.properties.href;
         if (typeof href !== 'string' || !/^https?:\/\//.test(href)) return;
-        if (!URL.canParse(href) || new URL(href).host === siteHost) return;
+        if (!URL.canParse(href) || new URL(href).hostname === siteHost) return;
         ctx.setProperty(node, 'target', '_blank');
         ctx.setProperty(node, 'rel', 'noopener');
       },
