@@ -12,7 +12,8 @@
     "astro": "astro",
     "check": "astro check && prettier --check . && bun test",
     "format": "prettier --write .",
-    "new": "bun run scripts/new-post.ts"
+    "new": "bun run scripts/new-post.ts",
+    "og-image": "bun run scripts/og-image.ts"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

@@ -1,11 +1,29 @@
-// 使い方: bun run scripts/og-image.ts
+// 使い方: bun run og-image
 // サイト共通の OGP 画像 public/og.png（1200x630）を Playwright で描き直す。
 // 記事ごとの画像は作らない（docs/design.md）。
+//
+// playwright は CI に入れたくないので devDependencies に入れていない。描き直すときだけ:
+//   bun add -d playwright@1.58.0
+//   bunx playwright@1.58.0 install chromium   （初回のみ）
+//   bun run og-image
+//   bun remove playwright
 
 import { join } from 'node:path';
-import { chromium } from 'playwright';
 
 const OUT = join(import.meta.dirname, '..', 'public', 'og.png');
+const PLAYWRIGHT = 'playwright';
+
+async function loadChromium() {
+  try {
+    const mod = await import(PLAYWRIGHT);
+    return mod.chromium;
+  } catch {
+    console.error(
+      'playwright が無い。`bun add -d playwright@1.58.0` と `bunx playwright@1.58.0 install chromium` を実行してから再度 `bun run og-image`。終わったら `bun remove playwright`。',
+    );
+    process.exit(1);
+  }
+}
 
 const html = `<!doctype html>
 <html lang="ja">
@@ -45,6 +63,7 @@ const html = `<!doctype html>
   </body>
 </html>`;
 
+const chromium = await loadChromium();
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage({
