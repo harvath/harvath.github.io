@@ -26,6 +26,21 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
+/** `YYYY-MM-DDTHH:mm:ss+09:00`（JST）。OGP の `article:published_time` 用。 */
+export function formatIsoJst(date: Date): string {
+  const local = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(date);
+  return `${local.replace(' ', 'T')}+09:00`;
+}
+
 export function yearOf(date: Date): string {
   return formatDate(date).slice(0, 4);
 }

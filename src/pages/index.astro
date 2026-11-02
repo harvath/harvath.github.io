@@ -1,11 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import { formatDate, getPosts, groupByYear } from '../lib/posts';
+import { SITE_DESCRIPTION } from '../lib/site';
 
 const years = groupByYear(await getPosts());
 ---
 
-<Base>
+<Base description={SITE_DESCRIPTION} canonical="/">
   <h1 class="visually-hidden">harvath</h1>
   {years.map(([year, posts]) => (
     <section>

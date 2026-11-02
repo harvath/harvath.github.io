@@ -1,13 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
+import { SITE_DESCRIPTION } from '../lib/site';
 ---
 
-<Base title="about">
+<Base title="about" description={SITE_DESCRIPTION} canonical="/about/">
   <header class="post-header">
     <h1>このサイトについて</h1>
   </header>
   <div class="prose">
-    <p>harvath の blog。技術と仕事のメモ、ゲームや個人プロジェクトの記録。</p>
+    <p>{SITE_DESCRIPTION}</p>
     <p>
       <a href="https://github.com/harvath" target="_blank" rel="noopener">
         github.com/harvath
