@@ -6,16 +6,18 @@ const years = groupByYear(await getPosts());
 ---
 
 <Base>
-  <h1>harvath</h1>
+  <h1 class="visually-hidden">harvath</h1>
   {years.map(([year, posts]) => (
     <section>
-      <h2>{year}</h2>
-      <ul>
+      <h2 class="year" id={year}>
+        {year}
+      </h2>
+      <ul class="posts">
         {posts.map((post) => (
           <li>
             <time datetime={formatDate(post.data.date)}>
               {formatDate(post.data.date)}
-            </time>{' '}
+            </time>
             <a href={post.url}>{post.data.title}</a>
           </li>
         ))}
