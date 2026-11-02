@@ -18,7 +18,7 @@
 | 記事の置き場 | `src/content/blog/<slug>/index.md`。画像は同じフォルダに置き `![説明](./foo.png)`。Astro が build 時に縮小・webp 化 |
 | slug | フォルダ名は `YYYY-MM-DD-slug`。URL には日付を出さず `/posts/<slug>/` |
 | frontmatter | `title`（必須）、`date`（必須）、`description`（任意。OGP と RSS にだけ使う。トップには出さない）、`draft`（任意、既定 false。true は本番 build から除外、dev では見える） |
-| 新規作成 | `bun new "タイトル"` でフォルダと `index.md` の雛形を作る |
+| 新規作成 | `bun new "タイトル" [slug]` でフォルダと `index.md` の雛形を作る。slug を省略すると聞かれる（TTY が無い場合は必須） |
 | 公開 | `main` に push → GitHub Actions（Astro 公式 action）→ Pages。branch も PR も挟まない。予約投稿なし |
 | 見た目 | system font stack（webfont なし）。本文 17px、行間 1.8、max-width 40em 前後。ダークモードは OS 追従、切替ボタンなし。dark を先に作り light を合わせる。色はリンク色 1 つ + 黒白グレー。罫線と余白で区切る |
 | 記事ページ | 公開日のみ（更新日なし）。目次なし。末尾に前の記事 / 次の記事、トップへ。シェアボタンなし。コードはコピーボタンなし |
