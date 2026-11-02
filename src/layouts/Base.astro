@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { formatIsoJst } from '../lib/posts';
-import { SITE_NAME } from '../lib/site';
+import { GITHUB_URL, SITE_NAME } from '../lib/site';
 
 interface Props {
   /** ページ名。省略するとトップ扱い（`<title>` はサイト名だけ）。 */
@@ -9,22 +9,26 @@ interface Props {
   /** 無いときは description と og:description を出さない。 */
   description?: string;
   type?: 'website' | 'article';
-  /** 既定は現在の URL（site 付き）。 */
+  /** ページの正規 URL（site からの相対で可）。渡したときだけ canonical と og:url を出す。 */
   canonical?: URL | string;
   /** 記事の公開日。`article:published_time` に出す。 */
   publishedTime?: Date;
+  /** 検索エンジンに載せないページ（404 など）。 */
+  noindex?: boolean;
 }
 
 const {
   title,
   description,
   type = 'website',
-  canonical = Astro.url.pathname,
+  canonical,
   publishedTime,
+  noindex = false,
 } = Astro.props;
 
 const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
-const canonicalUrl = new URL(canonical, Astro.site).href;
+const ogTitle = title ?? SITE_NAME;
+const canonicalUrl = canonical && new URL(canonical, Astro.site).href;
 const ogImage = new URL('/og.png', Astro.site).href;
 ---
 
@@ -35,7 +39,8 @@ const ogImage = new URL('/og.png', Astro.site).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
-    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link
@@ -44,10 +49,10 @@ const ogImage = new URL('/og.png', Astro.site).href;
       title={SITE_NAME}
       href="/rss.xml"
     />
-    <meta property="og:title" content={pageTitle} />
+    <meta property="og:title" content={ogTitle} />
     {description && <meta property="og:description" content={description} />}
     <meta property="og:type" content={type} />
-    <meta property="og:url" content={canonicalUrl} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
@@ -77,11 +82,11 @@ const ogImage = new URL('/og.png', Astro.site).href;
       <p>
         <a href="/rss.xml">RSS</a>
         {' · '}
-        <a href="https://github.com/harvath" target="_blank" rel="noopener">
+        <a href={GITHUB_URL} target="_blank" rel="noopener">
           GitHub
         </a>
       </p>
-      <p>© harvath</p>
+      <p>© {SITE_NAME}</p>
     </footer>
   </body>
 </html>

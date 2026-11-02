@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { SITE_DESCRIPTION } from '../lib/site';
+import { GITHUB_URL, SITE_DESCRIPTION } from '../lib/site';
 ---
 
 <Base title="about" description={SITE_DESCRIPTION} canonical="/about/">
@@ -10,8 +10,8 @@ import { SITE_DESCRIPTION } from '../lib/site';
   <div class="prose">
     <p>{SITE_DESCRIPTION}</p>
     <p>
-      <a href="https://github.com/harvath" target="_blank" rel="noopener">
-        github.com/harvath
+      <a href={GITHUB_URL} target="_blank" rel="noopener">
+        {GITHUB_URL.replace('https://', '')}
       </a>
     </p>
   </div>
