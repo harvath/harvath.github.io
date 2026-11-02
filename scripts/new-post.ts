@@ -1,11 +1,13 @@
 // 使い方: bun new "タイトル" [slug]
 // src/content/blog/YYYY-MM-DD-<slug>/index.md を draft: true で作る。
+// slug を省略すると聞かれる。TTY が無い場合（CI や agent 経由）は slug 必須。
 
 import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createInterface } from 'node:readline/promises';
 import { join } from 'node:path';
 
+const USAGE = '使い方: bun new "タイトル" [slug]';
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const BLOG_DIR = join(import.meta.dirname, '..', 'src', 'content', 'blog');
 
@@ -18,7 +20,17 @@ function todayJst(): string {
   }).format(new Date());
 }
 
+function fail(message: string): never {
+  console.error(message);
+  process.exit(1);
+}
+
 async function askSlug(): Promise<string> {
+  if (!process.stdin.isTTY) {
+    fail(
+      `slug が指定されていません。TTY が無い場合は slug 必須です。\n${USAGE}`,
+    );
+  }
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   try {
     return (await rl.question('slug (ASCII, e.g. my-first-post): ')).trim();
@@ -27,13 +39,8 @@ async function askSlug(): Promise<string> {
   }
 }
 
-function fail(message: string): never {
-  console.error(message);
-  process.exit(1);
-}
-
 const [title, slugArg] = process.argv.slice(2);
-if (!title) fail('使い方: bun new "タイトル" [slug]');
+if (!title) fail(USAGE);
 
 const slug = slugArg?.trim() || (await askSlug());
 if (!SLUG_RE.test(slug)) {
@@ -48,7 +55,6 @@ const frontmatter = [
   '---',
   `title: ${JSON.stringify(title)}`,
   `date: ${date}`,
-  "description: ''",
   'draft: true',
   '---',
   '',
