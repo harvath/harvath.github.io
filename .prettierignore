@@ -1,0 +1,5 @@
+# Prettier はソース（src/ と scripts/）だけを対象にする。記事の md は触らない。
+/*
+!/src/
+!/scripts/
+*.md
