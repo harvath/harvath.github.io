@@ -1,6 +1,8 @@
 // 使い方: bun run og-image
 // サイト共通の OGP 画像 public/og.png（1200x630）を Playwright で描き直す。
-// 記事ごとの画像は作らない（docs/design.md）。
+// GitHub のアバター（犬）を中央に丸く置くだけ。文字は入れない。
+// 中央に置くのは、Slack などが中央の正方形に切り抜いても犬が残るように。
+// 本文に画像がある記事は、その最初の画像が OGP になる（src/pages/posts/[slug].astro）。
 //
 // playwright は CI に入れたくないので devDependencies に入れていない。描き直すときだけ:
 //   bun add -d playwright@1.58.0
@@ -9,9 +11,19 @@
 //   bun remove playwright
 
 import { join } from 'node:path';
+import { GITHUB_URL } from '../src/lib/site';
 
 const OUT = join(import.meta.dirname, '..', 'public', 'og.png');
+const AVATAR_URL = `${GITHUB_URL}.png?size=460`;
 const PLAYWRIGHT = 'playwright';
+
+async function fetchAvatarDataUrl(): Promise<string> {
+  const res = await fetch(AVATAR_URL);
+  if (!res.ok) throw new Error(`${AVATAR_URL}: ${res.status}`);
+  const type = res.headers.get('content-type') ?? 'image/png';
+  const base64 = Buffer.from(await res.arrayBuffer()).toString('base64');
+  return `data:${type};base64,${base64}`;
+}
 
 async function loadChromium() {
   try {
@@ -25,6 +37,8 @@ async function loadChromium() {
   }
 }
 
+const avatar = await fetchAvatarDataUrl();
+
 const html = `<!doctype html>
 <html lang="ja">
   <head>
@@ -35,31 +49,20 @@ const html = `<!doctype html>
         width: 1200px;
         height: 630px;
         background: #17181a;
-        color: #e4e2dc;
-        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
         display: flex;
         align-items: center;
+        justify-content: center;
       }
-      .wrap { padding-left: 104px; }
-      .name {
-        font-size: 128px;
-        font-weight: 600;
-        letter-spacing: -0.02em;
-        line-height: 1;
-      }
-      .rule {
-        width: 160px;
-        height: 4px;
-        margin-top: 36px;
-        background: #8ab9db;
+      .avatar {
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        object-fit: cover;
       }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <div class="name">harvath</div>
-      <div class="rule"></div>
-    </div>
+    <img class="avatar" src="${avatar}" alt="" />
   </body>
 </html>`;
 
