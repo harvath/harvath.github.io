@@ -28,7 +28,7 @@
 | 著者表示 | 記事には出さない。about とフッターのみ |
 | RSS | 全文入り |
 | 日付表記 | `2026-11-02`。`<html lang="ja">`、JST 固定 |
-| OGP | サイト共通の画像 1 枚 + 記事の title / description をメタに出す。記事ごとの画像生成はしない |
+| OGP | 記事の title / description をメタに出す。画像は、本文に画像があればその最初の 1 枚（Astro の画像処理を通した幅 1200 まで）、無ければサイト共通の `public/og.png`（犬のアイコンを中央に置いただけ。`bun run og-image` で描き直す）。記事ごとの画像生成はしない |
 | 404 | 1 枚 |
 | 道具 | bun。Node は `.node-version` と `engines` で固定、CI も同じ版。TypeScript strict。Prettier はソースのみ（md 本文は対象外） |
 | 履歴 | 既存の git 履歴の上に作り直す。Hugo のファイルは削除 |

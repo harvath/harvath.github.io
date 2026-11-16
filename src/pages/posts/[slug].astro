@@ -1,7 +1,48 @@
 ---
+import { posix } from 'node:path';
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
 import { render } from 'astro:content';
-import Base from '../../layouts/Base.astro';
+import Base, { type OgImage } from '../../layouts/Base.astro';
+import { firstImage } from '../../lib/og';
 import { formatDate, getPosts, type Post } from '../../lib/posts';
+
+/** 記事フォルダに置かれた画像。key は `/src/content/blog/<id>/<file>`。 */
+const localImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/content/blog/*/*.{png,jpg,jpeg,webp,gif,avif}',
+);
+
+const OG_FORMATS = new Set(['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif']);
+
+/**
+ * 本文の最初の画像を OGP 画像にする。無ければ `undefined`（サイト共通の og.png になる）。
+ * 相対パスは記事フォルダから解決し、Astro の画像処理を通した URL（幅 1200 まで）を使う。
+ */
+async function ogImageFor(post: Post): Promise<OgImage | undefined> {
+  const ref = firstImage(post.body ?? '');
+  if (!ref) return undefined;
+  if (/^https?:\/\//.test(ref)) return { url: ref };
+
+  const dir = post.filePath
+    ? posix.dirname(post.filePath)
+    : `src/content/blog/${post.id}`;
+  const key = '/' + posix.normalize(posix.join(dir, ref));
+  const load = localImages[key];
+  if (!load) return undefined;
+
+  const { default: meta } = await load();
+  const format = OG_FORMATS.has(meta.format) ? meta.format : 'png';
+  const img = await getImage({
+    src: meta,
+    width: Math.min(meta.width, 1200),
+    format,
+  });
+  return {
+    url: new URL(img.src, Astro.site).href,
+    width: Number(img.attributes.width) || undefined,
+    height: Number(img.attributes.height) || undefined,
+  };
+}
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -20,6 +61,7 @@ interface Props {
 const { post, newer, older } = Astro.props;
 const { Content } = await render(post);
 const date = formatDate(post.data.date);
+const image = await ogImageFor(post);
 ---
 
 <Base
@@ -28,6 +70,7 @@ const date = formatDate(post.data.date);
   type="article"
   canonical={post.url}
   publishedTime={post.data.date}
+  image={image}
 >
   <article>
     <header class="post-header">

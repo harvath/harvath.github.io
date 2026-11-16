@@ -15,6 +15,14 @@ interface Props {
   publishedTime?: Date;
   /** 検索エンジンに載せないページ（404 など）。 */
   noindex?: boolean;
+  /** OGP 画像（絶対 URL）。省略するとサイト共通の `/og.png`。 */
+  image?: OgImage;
+}
+
+export interface OgImage {
+  url: string;
+  width?: number;
+  height?: number;
 }
 
 const {
@@ -24,12 +32,17 @@ const {
   canonical,
   publishedTime,
   noindex = false,
+  image,
 } = Astro.props;
 
 const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 const ogTitle = title ?? SITE_NAME;
 const canonicalUrl = canonical && new URL(canonical, Astro.site).href;
-const ogImage = new URL('/og.png', Astro.site).href;
+const ogImage: OgImage = image ?? {
+  url: new URL('/og.png', Astro.site).href,
+  width: 1200,
+  height: 630,
+};
 ---
 
 <!doctype html>
@@ -56,9 +69,13 @@ const ogImage = new URL('/og.png', Astro.site).href;
     <meta property="og:type" content={type} />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:site_name" content={SITE_NAME} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image" content={ogImage.url} />
+    {ogImage.width && (
+      <meta property="og:image:width" content={String(ogImage.width)} />
+    )}
+    {ogImage.height && (
+      <meta property="og:image:height" content={String(ogImage.height)} />
+    )}
     <meta property="og:locale" content="ja_JP" />
     {type === 'article' && publishedTime && (
       <meta
