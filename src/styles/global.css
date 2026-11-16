@@ -5,8 +5,10 @@
   --text: #e4e2dc;
   --muted: #8f918d;
   --rule: #2b2d30;
+  --hr: #4a4c50;
   --code-bg: #1f2124;
   --accent: #8ab9db;
+  --body-weight: 300;
 
   --font-sans:
     -apple-system, BlinkMacSystemFont, 'Hiragino Sans',
@@ -23,8 +25,10 @@
     --text: #1e1f22;
     --muted: #6f716d;
     --rule: #e3e1da;
+    --hr: #cfcdc6;
     --code-bg: #f1f0ea;
     --accent: #1f6a95;
+    --body-weight: 400;
   }
 }
 
@@ -270,6 +274,10 @@ h1 {
 }
 
 /* md 本文 */
+.prose {
+  font-weight: var(--body-weight);
+}
+
 .prose > :first-child {
   margin-top: 0;
 }
@@ -371,10 +379,9 @@ h1 {
 
 .prose hr {
   border: 0;
-  width: 4rem;
   height: 1px;
-  background: var(--rule);
-  margin: 3em auto;
+  background: var(--hr);
+  margin: 3em 0;
 }
 
 .prose img {
@@ -441,5 +448,5 @@ h1 {
 }
 
 .prose strong {
-  font-weight: 600;
+  font-weight: 700;
 }
